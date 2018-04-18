@@ -11,5 +11,8 @@ lazy val root = (project in file(".")).
     libraryDependencies ++= Seq(
       specs2,
       slf4jApi,
-      log4Jdbc)
+      log4Jdbc,
+      testcontainersScala % "test",
+      testcontainersPostgresql % "test",
+      postgresql % "test")
   )
