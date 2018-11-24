@@ -173,8 +173,7 @@ abstract class ColumnDefinition {
       options = options filter { _ ne option }
 
       if (isAutoIncrement) {
-        logger.warn("Redundant AutoIncrement specified for the '{}' column.",
-          getColumnName)
+        logger.warn("Redundant AutoIncrement specified for the '{}' column.", getColumnName)
       }
       isAutoIncrement = true
     }
@@ -190,8 +189,7 @@ abstract class ColumnDefinition {
       options = options filter { _ ne option }
 
       if (isUnsigned) {
-        logger.warn("Redundant Unsigned specified for the '{}' column.",
-          getColumnName)
+        logger.warn("Redundant Unsigned specified for the '{}' column.", getColumnName)
       }
       isUnsigned = true
     }
@@ -207,9 +205,11 @@ abstract class ColumnDefinition {
       options = options filter { _ ne option }
 
       if (default.isDefined && default.get != value) {
-        logger.warn("Redefining the default value for the '{}' column " +
-          "from '{}' to '{}'.",
-          Array[AnyRef](getColumnName, default.get, value): _*)
+        logger.warn(
+          "Redefining the default value for the '{}' column " +
+            "from '{}' to '{}'.",
+          Array[AnyRef](getColumnName, default.get, value): _*
+        )
       }
       default = Some(value)
     }
@@ -234,9 +234,11 @@ abstract class ColumnDefinition {
       options = options filter { _ ne option }
 
       if (_limitOpt.isDefined && _limitOpt.get != length) {
-        logger.warn("Redefining the limit for the '{}' column " +
-          "from '{}' to '{}'.",
-          Array[AnyRef](getColumnName, _limitOpt.get, length): _*)
+        logger.warn(
+          "Redefining the limit for the '{}' column " +
+            "from '{}' to '{}'.",
+          Array[AnyRef](getColumnName, _limitOpt.get, length): _*
+        )
       }
       _limitOpt = Some(length)
     }
@@ -258,11 +260,15 @@ abstract class ColumnDefinition {
         options = options filter { _ ne option }
 
         if (n1.isDefined && n1 != n2) {
-          logger.warn("Redefining the '{}' column's nullability " +
-            "from {} to {}.",
-            Array[AnyRef](getColumnName,
+          logger.warn(
+            "Redefining the '{}' column's nullability " +
+              "from {} to {}.",
+            Array[AnyRef](
+              getColumnName,
               if (n1.get) "NOT NULL" else "NULL",
-              if (n2.get) "NOT NULL" else "NULL"): _*)
+              if (n2.get) "NOT NULL" else "NULL"
+            ): _*
+          )
         }
         n1 = n2
       }
@@ -304,11 +310,15 @@ abstract class ColumnDefinition {
       options = options filter { _ ne option }
 
       if (_precisionOpt.isDefined && _precisionOpt.get != value) {
-        logger.warn("Redefining the precision for the '{}' column " +
-          "from '{}' to '{}'.",
-          Array[AnyRef](getColumnName,
+        logger.warn(
+          "Redefining the precision for the '{}' column " +
+            "from '{}' to '{}'.",
+          Array[AnyRef](
+            getColumnName,
             java.lang.Integer.valueOf(_precisionOpt.get),
-            java.lang.Integer.valueOf(value)): _*)
+            java.lang.Integer.valueOf(value)
+          ): _*
+        )
       }
       _precisionOpt = Some(value)
     }
@@ -333,11 +343,15 @@ abstract class ColumnDefinition {
       options = options filter { _ ne option }
 
       if (_scaleOpt.isDefined && _scaleOpt.get != value) {
-        logger.warn("Redefining the scale for the '{}' column " +
-          "from '{}' to '{}'.",
-          Array[AnyRef](getColumnName,
+        logger.warn(
+          "Redefining the scale for the '{}' column " +
+            "from '{}' to '{}'.",
+          Array[AnyRef](
+            getColumnName,
             java.lang.Integer.valueOf(_scaleOpt.get),
-            java.lang.Integer.valueOf(value)): _*)
+            java.lang.Integer.valueOf(value)
+          ): _*
+        )
       }
       _scaleOpt = Some(value)
     }
@@ -385,8 +399,7 @@ abstract class ColumnDefinition {
 
     if (getAdapter.supportsCheckConstraints) {
       for (option <- options) {
-        def appendCheckSql(name: String,
-                           expr: String) {
+        def appendCheckSql(name: String, expr: String) {
           options = options filter { _ ne option }
 
           sb.append(" CONSTRAINT ")
@@ -402,8 +415,7 @@ abstract class ColumnDefinition {
           }
 
           case Check(expr) => {
-            val tbd = new TableColumnDefinition(getTableName,
-              Array(getColumnName))
+            val tbd = new TableColumnDefinition(getTableName, Array(getColumnName))
             val on = new On(tbd)
             val (name, _) = getAdapter.generateCheckConstraintName(on)
 
@@ -417,14 +429,18 @@ abstract class ColumnDefinition {
 
     // Warn for any unused options.
     if (!options.isEmpty) {
-      logger.warn("The following options for the '{}' column are unused: {}.",
-        Array[AnyRef](getColumnName, options): _*)
+      logger.warn(
+        "The following options for the '{}' column are unused: {}.",
+        Array[AnyRef](getColumnName, options): _*
+      )
     }
 
     // Warn about illegal combinations in some databases.
     if (isPrimaryKey && notNullOpt.isDefined && !notNullOpt.get) {
-      logger.warn("Specifying PrimaryKey and Nullable in a column is not " +
-        "supported in all databases.")
+      logger.warn(
+        "Specifying PrimaryKey and Nullable in a column is not " +
+          "supported in all databases."
+      )
     }
 
     // Warn when different options are used that specify the same
@@ -450,12 +466,11 @@ abstract class ColumnDefinition {
     *         given
     */
   protected def optionallyAddLimitToDataType(columnTypeName: String,
-                                             limitOpt: Option[String]): String = {
+                                             limitOpt: Option[String]): String =
     limitOpt match {
       case Some(l) => columnTypeName + "(" + l + ")"
       case None => columnTypeName
     }
-  }
 
   /**
     * Given the SQL for a column data type, return it with the LIMIT
@@ -466,9 +481,8 @@ abstract class ColumnDefinition {
     * @return the column type name with the limit syntax if the column
     *         definition specifies a limit
     */
-  protected def optionallyAddLimitToDataType(columnTypeName: String): String = {
+  protected def optionallyAddLimitToDataType(columnTypeName: String): String =
     optionallyAddLimitToDataType(columnTypeName, limit)
-  }
 }
 
 /**
@@ -476,17 +490,18 @@ abstract class ColumnDefinition {
   * column types.
   */
 abstract class AbstractDecimalColumnDefinition
-  extends ColumnDefinition
+    extends ColumnDefinition
     with ColumnSupportsDefault
     with ColumnSupportsPrecision
     with ColumnSupportsScale {
+
   /**
     * Concrete subclasses must define this to the name of the DECIMAL
     * or NUMERIC data type specific for the database.
     */
   val decimalSqlName: String
 
-  override protected def sql: String = {
+  override protected def sql: String =
     (precision, scale) match {
       case (None, None) =>
         decimalSqlName
@@ -495,76 +510,69 @@ abstract class AbstractDecimalColumnDefinition
       case (Some(p), Some(s)) =>
         decimalSqlName + "(" + p + ", " + s + ")"
       case (None, Some(_)) =>
-        throw new IllegalArgumentException("Cannot specify a scale without " +
-          "also specifying a precision.")
+        throw new IllegalArgumentException(
+          "Cannot specify a scale without " +
+            "also specifying a precision."
+        )
     }
-  }
 }
 
-class DefaultBigintColumnDefinition
-  extends ColumnDefinition
-    with ColumnSupportsDefault {
+class DefaultBigintColumnDefinition extends ColumnDefinition with ColumnSupportsDefault {
   override protected def sql = "BIGINT"
 }
 
-class DefaultBlobColumnDefinition
-  extends ColumnDefinition {
+class DefaultBlobColumnDefinition extends ColumnDefinition {
   override protected def sql = "BLOB"
 }
 
-class DefaultBooleanColumnDefinition
-  extends ColumnDefinition
-    with ColumnSupportsDefault {
+class DefaultBooleanColumnDefinition extends ColumnDefinition with ColumnSupportsDefault {
   override protected def sql = "BOOLEAN"
 }
 
 class DefaultCharColumnDefinition
-  extends ColumnDefinition
+    extends ColumnDefinition
     with ColumnSupportsLimit
     with ColumnSupportsDefault {
   override protected def sql = optionallyAddLimitToDataType("CHAR")
 }
 
-class DefaultDecimalColumnDefinition
-  extends AbstractDecimalColumnDefinition {
+class DefaultDecimalColumnDefinition extends AbstractDecimalColumnDefinition {
   override val decimalSqlName = "DECIMAL"
 }
 
-class DefaultIntegerColumnDefinition
-  extends ColumnDefinition
-    with ColumnSupportsDefault {
+class DefaultIntegerColumnDefinition extends ColumnDefinition with ColumnSupportsDefault {
   override protected def sql = "INTEGER"
 }
 
-class DefaultSmallintColumnDefinition
-  extends ColumnDefinition
-    with ColumnSupportsDefault {
+class DefaultSmallintColumnDefinition extends ColumnDefinition with ColumnSupportsDefault {
   override protected def sql = "SMALLINT"
 }
 
 class DefaultTimestampColumnDefinition
-  extends ColumnDefinition
+    extends ColumnDefinition
     with ColumnSupportsLimit
     with ColumnSupportsDefault {
   override protected def sql = optionallyAddLimitToDataType("TIMESTAMP")
 }
 
 class DefaultVarbinaryColumnDefinition
-  extends ColumnDefinition
+    extends ColumnDefinition
     with ColumnSupportsLimit
     with ColumnSupportsDefault {
   override protected def sql = optionallyAddLimitToDataType("VARBINARY")
 }
 
 class DefaultVarcharColumnDefinition
-  extends ColumnDefinition
+    extends ColumnDefinition
     with ColumnSupportsLimit
     with ColumnSupportsDefault {
   override protected def sql = optionallyAddLimitToDataType("VARCHAR")
 }
 
-class DefaultFloatColumnDefinition
-  extends ColumnDefinition
-    with ColumnSupportsDefault {
+class DefaultFloatColumnDefinition extends ColumnDefinition with ColumnSupportsDefault {
   override protected def sql = "REAL"
+}
+
+class DefaultUUIDColumnDefinition extends ColumnDefinition with ColumnSupportsDefault {
+  override protected def sql = "UUID"
 }

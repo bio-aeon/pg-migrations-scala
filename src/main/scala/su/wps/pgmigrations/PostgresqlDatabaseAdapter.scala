@@ -1,40 +1,37 @@
 package su.wps.pgmigrations
 
 class PostgresqlBigintColumnDefinition
-  extends DefaultBigintColumnDefinition
+    extends DefaultBigintColumnDefinition
     with ColumnSupportsAutoIncrement {
-  override protected def sql: String = {
+  override protected def sql: String =
     if (isAutoIncrement) "BIGSERIAL"
     else super.sql
-  }
 }
 
 class PostgresqlByteaColumnDefinition
-  extends DefaultBlobColumnDefinition
+    extends DefaultBlobColumnDefinition
     with ColumnSupportsDefault {
   override protected def sql = "BYTEA"
 }
 
 class PostgresqlIntegerColumnDefinition
-  extends DefaultIntegerColumnDefinition
+    extends DefaultIntegerColumnDefinition
     with ColumnSupportsAutoIncrement {
-  override protected def sql: String = {
+  override protected def sql: String =
     if (isAutoIncrement) "SERIAL"
     else super.sql
-  }
 }
 
 class PostgresqlSmallintColumnDefinition
-  extends DefaultSmallintColumnDefinition
+    extends DefaultSmallintColumnDefinition
     with ColumnSupportsAutoIncrement {
-  override protected def sql: String = {
+  override protected def sql: String =
     if (isAutoIncrement) "SMALLSERIAL"
     else super.sql
-  }
 }
 
 class PostgresqlDatabaseAdapter(override val schemaNameOpt: Option[String])
-  extends DatabaseAdapter(schemaNameOpt) {
+    extends DatabaseAdapter(schemaNameOpt) {
   override val vendor = Postgresql
 
   override val quoteCharacter = '"'
@@ -54,9 +51,11 @@ class PostgresqlDatabaseAdapter(override val schemaNameOpt: Option[String])
     characterSetOpt match {
       case None =>
       case Some(charset @ CharacterSet(_, _)) =>
-        logger.warn("Ignoring '{}' as the character set encoding can only " +
-          "be specified in PostgreSQL when the database is created.",
-          charset)
+        logger.warn(
+          "Ignoring '{}' as the character set encoding can only " +
+            "be specified in PostgreSQL when the database is created.",
+          charset
+        )
     }
 
     columnType match {
@@ -82,11 +81,13 @@ class PostgresqlDatabaseAdapter(override val schemaNameOpt: Option[String])
         new DefaultVarcharColumnDefinition
       case FloatType =>
         new DefaultFloatColumnDefinition
+      case UUIDType =>
+        new DefaultUUIDColumnDefinition
     }
   }
 
   override protected def alterColumnSql(schemaNameOpt: Option[String],
-                                        columnDefinition: ColumnDefinition): String = {
+                                        columnDefinition: ColumnDefinition): String =
     new java.lang.StringBuilder(512)
       .append("ALTER TABLE ")
       .append(quoteTableName(schemaNameOpt, columnDefinition.getTableName))
@@ -95,5 +96,4 @@ class PostgresqlDatabaseAdapter(override val schemaNameOpt: Option[String])
       .append(" TYPE ")
       .append(columnDefinition.toSql)
       .toString
-  }
 }

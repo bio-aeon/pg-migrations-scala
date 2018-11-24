@@ -33,9 +33,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add any known column type to the table.  The actual SQL text used
-    * to create the column is chosen by the database adapter and may be
-    * different than the name of the columnType argument.
+    * Add any known column type to the table.
     *
     * @param name the column's name
     * @param columnType the type of column being added
@@ -55,9 +53,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a BIGINT column type to the table.  The actual SQL text used
-    * to create the column is chosen by the database adapter and may be
-    * different than the name of the columnType argument.
+    * Add a BIGINT column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -70,9 +66,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a BLOB column type to the table.  The actual SQL text used to
-    * create the column is chosen by the database adapter and may be
-    * different than the name of the columnType argument.
+    * Add a BLOB column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -85,9 +79,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a BOOLEAN column type to the table.  The actual SQL text used
-    * to create the column is chosen by the database adapter and may be
-    * different than the name of the columnType argument.
+    * Add a BOOLEAN column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -100,9 +92,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a CHAR column type to the table.  The actual SQL text used to
-    * create the column is chosen by the database adapter and may be
-    * different than the name of the columnType argument.
+    * Add a CHAR column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -115,9 +105,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a DECIMAL column type to the table.  The actual SQL text used
-    * to create the column is chosen by the database adapter and may be
-    * different than the name of the columnType argument.
+    * Add a DECIMAL column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -130,9 +118,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a INTEGER column type to the table.  The actual SQL text used
-    * to create the column is chosen by the database adapter and may be
-    * different than the name of the columnType argument.
+    * Add a INTEGER column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -145,9 +131,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a SMALLINT column type to the table.  The actual SQL text
-    * used to create the column is chosen by the database adapter and
-    * may be different than the name of the columnType argument.
+    * Add a SMALLINT column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -160,9 +144,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a TIMESTAMP column type to the table.  The actual SQL text
-    * used to create the column is chosen by the database adapter and
-    * may be different than the name of the columnType argument.
+    * Add a TIMESTAMP column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -175,9 +157,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a VARBINARY column type to the table.  The actual SQL text
-    * used to create the column is chosen by the database adapter and
-    * may be different than the name of the columnType argument.
+    * Add a VARBINARY column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -190,9 +170,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a VARCHAR column type to the table.  The actual SQL text used
-    * to create the column is chosen by the database adapter and may be
-    * different than the name of the columnType argument.
+    * Add a VARCHAR column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -205,9 +183,7 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
-    * Add a FLOAT column type to the table.  The actual SQL text used
-    * to create the column is chosen by the database adapter and may be
-    * different than the name of the columnType argument.
+    * Add a FLOAT column type to the table.
     *
     * @param name the column's name
     * @param options a possibly empty array of column options to customize the
@@ -216,5 +192,17 @@ class TableDefinition(adapter: DatabaseAdapter,
     */
   final def float(name: String, options: ColumnOption*): TableDefinition = {
     column(name, FloatType, options: _*)
+  }
+
+  /**
+    * Add a UUID column type to the table.
+    *
+    * @param name the column's name
+    * @param options a possibly empty array of column options to customize the
+    *        column
+    * @return the same instance
+    */
+  final def uuid(name: String, options: ColumnOption*): TableDefinition = {
+    column(name, UUIDType, options: _*)
   }
 }

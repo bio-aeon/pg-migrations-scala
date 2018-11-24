@@ -17,3 +17,4 @@ case object TimestampType extends SqlType
 case object VarbinaryType extends SqlType
 case object VarcharType extends SqlType
 case object FloatType extends SqlType
+case object UUIDType extends SqlType
