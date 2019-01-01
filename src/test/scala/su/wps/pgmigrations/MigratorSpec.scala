@@ -197,6 +197,8 @@ class MigratorSpec extends Specification with ForAllTestContainer with BeforeEac
           ("timestamp_column", new java.sql.Date(now)),
           ("varbinary_column", varbinaryArray),
           ("varchar_column", "ABCD"),
+          ("text_column", "ABCD"),
+          ("float_column", 3.14f),
           ("uuid_column", java.util.UUID.randomUUID())
         ).map {
           case (n, v) =>

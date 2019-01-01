@@ -569,6 +569,10 @@ class DefaultVarcharColumnDefinition
   override protected def sql = optionallyAddLimitToDataType("VARCHAR")
 }
 
+class DefaultTextColumnDefinition extends ColumnDefinition with ColumnSupportsDefault {
+  override protected def sql = "TEXT"
+}
+
 class DefaultFloatColumnDefinition extends ColumnDefinition with ColumnSupportsDefault {
   override protected def sql = "REAL"
 }

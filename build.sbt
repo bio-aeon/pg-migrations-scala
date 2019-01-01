@@ -4,14 +4,14 @@ lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
       organization := "su.wps",
-      scalaVersion := "2.12.5",
+      scalaVersion := "2.12.8",
       version      := "0.1.0-SNAPSHOT"
     )),
     name := "pg-migrations-scala",
     libraryDependencies ++= Seq(
-      specs2,
       slf4jApi,
       log4Jdbc,
+      specs2 % "test",
       testcontainersScala % "test",
       testcontainersPostgresql % "test",
       postgresql % "test")

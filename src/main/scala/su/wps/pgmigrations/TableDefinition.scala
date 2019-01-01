@@ -183,6 +183,18 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
+    * Add a TEXT column type to the table.
+    *
+    * @param name the column's name
+    * @param options a possibly empty array of column options to customize the
+    *        column
+    * @return the same instance
+    */
+  final def text(name: String, options: ColumnOption*): TableDefinition = {
+    column(name, TextType, options: _*)
+  }
+
+  /**
     * Add a FLOAT column type to the table.
     *
     * @param name the column's name

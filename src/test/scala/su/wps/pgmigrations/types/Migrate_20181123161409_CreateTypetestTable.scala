@@ -15,6 +15,8 @@ class Migrate_20181123161409_CreateTypetestTable extends Migration {
       t.timestamp("timestamp_column")
       t.varbinary("varbinary_column", Limit(4))
       t.varchar("varchar_column", Limit(4))
+      t.text("text_column")
+      t.float("float_column")
       t.uuid("uuid_column")
     }
   }
