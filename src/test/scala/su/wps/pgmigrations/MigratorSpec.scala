@@ -195,6 +195,7 @@ class MigratorSpec extends Specification with ForAllTestContainer with BeforeEac
           ("integer_column", java.lang.Integer.MIN_VALUE),
           ("integer_column", java.lang.Integer.MAX_VALUE),
           ("timestamp_column", new java.sql.Date(now)),
+          ("timestampz_column", new java.sql.Date(now)),
           ("varbinary_column", varbinaryArray),
           ("varchar_column", "ABCD"),
           ("text_column", "ABCD"),

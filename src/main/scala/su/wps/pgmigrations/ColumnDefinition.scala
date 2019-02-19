@@ -555,6 +555,13 @@ class DefaultTimestampColumnDefinition
   override protected def sql = optionallyAddLimitToDataType("TIMESTAMP")
 }
 
+class DefaultTimestampzColumnDefinition
+  extends ColumnDefinition
+    with ColumnSupportsLimit
+    with ColumnSupportsDefault {
+  override protected def sql = optionallyAddLimitToDataType("TIMESTAMPTZ")
+}
+
 class DefaultVarbinaryColumnDefinition
     extends ColumnDefinition
     with ColumnSupportsLimit

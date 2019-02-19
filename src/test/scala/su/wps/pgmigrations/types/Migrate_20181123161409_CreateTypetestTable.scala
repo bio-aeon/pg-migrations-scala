@@ -13,6 +13,7 @@ class Migrate_20181123161409_CreateTypetestTable extends Migration {
       t.decimal("decimal_column", Precision(22), Scale(2))
       t.integer("integer_column")
       t.timestamp("timestamp_column")
+      t.timestampz("timestampz_column")
       t.varbinary("varbinary_column", Limit(4))
       t.varchar("varchar_column", Limit(4))
       t.text("text_column")

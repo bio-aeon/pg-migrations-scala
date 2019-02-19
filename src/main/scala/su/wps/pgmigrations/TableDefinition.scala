@@ -157,6 +157,19 @@ class TableDefinition(adapter: DatabaseAdapter,
   }
 
   /**
+    * Add a TIMESTAMPTZ column type to the table.
+    *
+    * @param name the column's name
+    * @param options a possibly empty array of column options to customize the
+    *        column
+    * @return the same instance
+    */
+  final def timestampz(name: String,
+                       options: ColumnOption*): TableDefinition = {
+    column(name, TimestampzType, options: _*)
+  }
+
+  /**
     * Add a VARBINARY column type to the table.
     *
     * @param name the column's name
