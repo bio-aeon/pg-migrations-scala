@@ -20,3 +20,4 @@ case object VarcharType extends SqlType
 case object TextType extends SqlType
 case object FloatType extends SqlType
 case object UUIDType extends SqlType
+case object JSONBType extends SqlType

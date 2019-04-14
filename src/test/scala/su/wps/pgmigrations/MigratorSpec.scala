@@ -1,6 +1,7 @@
 package su.wps.pgmigrations
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
+import org.postgresql.util.PGobject
 import org.specs2.execute.Result
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeEach
@@ -187,6 +188,10 @@ class MigratorSpec extends Specification with ForAllTestContainer with BeforeEac
       val now = System.currentTimeMillis
 
       val counts = migrator.withLoggingConnection(AutoCommit) { c =>
+        val o = new PGobject
+        o.setType("jsonb")
+        o.setValue("{}")
+
         List(
           ("bigint_column", java.lang.Long.MIN_VALUE),
           ("bigint_column", java.lang.Long.MAX_VALUE),
@@ -200,7 +205,8 @@ class MigratorSpec extends Specification with ForAllTestContainer with BeforeEac
           ("varchar_column", "ABCD"),
           ("text_column", "ABCD"),
           ("float_column", 3.14f),
-          ("uuid_column", java.util.UUID.randomUUID())
+          ("uuid_column", java.util.UUID.randomUUID()),
+          ("jsonb_column", o)
         ).map {
           case (n, v) =>
             val insertSql = """INSERT INTO

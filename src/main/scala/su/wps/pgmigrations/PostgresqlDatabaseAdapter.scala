@@ -87,6 +87,8 @@ class PostgresqlDatabaseAdapter(override val schemaNameOpt: Option[String])
         new DefaultFloatColumnDefinition
       case UUIDType =>
         new DefaultUUIDColumnDefinition
+      case JSONBType =>
+        new DefaultJSONBColumnDefinition
     }
   }
 

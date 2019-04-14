@@ -19,6 +19,7 @@ class Migrate_20181123161409_CreateTypetestTable extends Migration {
       t.text("text_column")
       t.float("float_column")
       t.uuid("uuid_column")
+      t.jsonb("jsonb_column")
     }
   }
 

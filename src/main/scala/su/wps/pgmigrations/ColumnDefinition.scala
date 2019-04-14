@@ -587,3 +587,7 @@ class DefaultFloatColumnDefinition extends ColumnDefinition with ColumnSupportsD
 class DefaultUUIDColumnDefinition extends ColumnDefinition with ColumnSupportsDefault {
   override protected def sql = "UUID"
 }
+
+class DefaultJSONBColumnDefinition extends ColumnDefinition with ColumnSupportsDefault {
+  override protected def sql = "JSONB"
+}
