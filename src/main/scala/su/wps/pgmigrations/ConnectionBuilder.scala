@@ -1,17 +1,17 @@
 package su.wps.pgmigrations
 
-import java.sql.{
-  Connection,
-  DriverManager
-}
+import java.sql.{Connection, DriverManager}
 import javax.sql.DataSource
 
 /**
   * Adapter class for getting a Connection from either the
   * DriverManager or a DataSource.
   */
-class ConnectionBuilder private (either: Either[DataSource, String],
-                                 loginOpt: Option[(String, String)]) {
+class ConnectionBuilder private (
+  either: Either[DataSource, String],
+  loginOpt: Option[(String, String)]
+) {
+
   /**
     * Construct a connection builder for a database that does not need
     * a username and password.
@@ -31,9 +31,7 @@ class ConnectionBuilder private (either: Either[DataSource, String],
     * @param password the password associated with the database
     *        username
     */
-  def this(url: String,
-           username: String,
-           password: String) {
+  def this(url: String, username: String, password: String) {
     this(Right(url), Some((username, password)))
   }
 
@@ -57,9 +55,7 @@ class ConnectionBuilder private (either: Either[DataSource, String],
     * @param password the password associated with the database
     *        username
     */
-  def this(datasource: DataSource,
-           username: String,
-           password: String) {
+  def this(datasource: DataSource, username: String, password: String) {
     this(Left(datasource), Some((username, password)))
   }
 

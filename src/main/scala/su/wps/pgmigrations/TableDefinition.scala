@@ -6,8 +6,7 @@ import scala.collection.mutable
   * A builder to define a table.  Its methods add the specified type of
   * column to the table's definition.
   */
-class TableDefinition(adapter: DatabaseAdapter,
-                      tableName: String) {
+class TableDefinition(adapter: DatabaseAdapter, tableName: String) {
   private val columnDefinitions = new mutable.ListBuffer[ColumnDefinition]
 
   /**
@@ -21,8 +20,7 @@ class TableDefinition(adapter: DatabaseAdapter,
     for (columnDefinition <- columnDefinitions) {
       if (firstColumn) {
         firstColumn = false
-      }
-      else {
+      } else {
         sb.append(", ")
       }
       sb.append(columnDefinition.getColumnName)
@@ -41,13 +39,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def column(name: String,
-                   columnType: SqlType,
-                   options: ColumnOption*): TableDefinition = {
-    val columnDefinition = adapter.newColumnDefinition(tableName,
-      name,
-      columnType,
-      options: _*)
+  final def column(name: String, columnType: SqlType, options: ColumnOption*): TableDefinition = {
+    val columnDefinition = adapter.newColumnDefinition(tableName, name, columnType, options: _*)
     columnDefinitions += columnDefinition
     this
   }
@@ -60,10 +53,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def bigint(name: String,
-                   options: ColumnOption*): TableDefinition = {
+  final def bigint(name: String, options: ColumnOption*): TableDefinition =
     column(name, BigintType, options: _*)
-  }
 
   /**
     * Add a BLOB column type to the table.
@@ -73,10 +64,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def blob(name: String,
-                 options: ColumnOption*): TableDefinition = {
+  final def blob(name: String, options: ColumnOption*): TableDefinition =
     column(name, BlobType, options: _*)
-  }
 
   /**
     * Add a BOOLEAN column type to the table.
@@ -86,10 +75,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def boolean(name: String,
-                    options: ColumnOption*): TableDefinition = {
+  final def boolean(name: String, options: ColumnOption*): TableDefinition =
     column(name, BooleanType, options: _*)
-  }
 
   /**
     * Add a CHAR column type to the table.
@@ -99,10 +86,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def char(name: String,
-                 options: ColumnOption*): TableDefinition = {
+  final def char(name: String, options: ColumnOption*): TableDefinition =
     column(name, CharType, options: _*)
-  }
 
   /**
     * Add a DECIMAL column type to the table.
@@ -112,10 +97,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def decimal(name: String,
-                    options: ColumnOption*): TableDefinition = {
+  final def decimal(name: String, options: ColumnOption*): TableDefinition =
     column(name, DecimalType, options: _*)
-  }
 
   /**
     * Add a INTEGER column type to the table.
@@ -125,10 +108,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def integer(name: String,
-                    options: ColumnOption*): TableDefinition = {
+  final def integer(name: String, options: ColumnOption*): TableDefinition =
     column(name, IntegerType, options: _*)
-  }
 
   /**
     * Add a SMALLINT column type to the table.
@@ -138,10 +119,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def smallint(name: String,
-                     options: ColumnOption*): TableDefinition = {
+  final def smallint(name: String, options: ColumnOption*): TableDefinition =
     column(name, SmallintType, options: _*)
-  }
 
   /**
     * Add a TIMESTAMP column type to the table.
@@ -151,10 +130,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def timestamp(name: String,
-                      options: ColumnOption*): TableDefinition = {
+  final def timestamp(name: String, options: ColumnOption*): TableDefinition =
     column(name, TimestampType, options: _*)
-  }
 
   /**
     * Add a TIMESTAMPTZ column type to the table.
@@ -164,10 +141,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def timestampz(name: String,
-                       options: ColumnOption*): TableDefinition = {
+  final def timestampz(name: String, options: ColumnOption*): TableDefinition =
     column(name, TimestampzType, options: _*)
-  }
 
   /**
     * Add a VARBINARY column type to the table.
@@ -177,10 +152,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def varbinary(name: String,
-                      options: ColumnOption*): TableDefinition = {
+  final def varbinary(name: String, options: ColumnOption*): TableDefinition =
     column(name, VarbinaryType, options: _*)
-  }
 
   /**
     * Add a VARCHAR column type to the table.
@@ -190,10 +163,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def varchar(name: String,
-                    options: ColumnOption*): TableDefinition = {
+  final def varchar(name: String, options: ColumnOption*): TableDefinition =
     column(name, VarcharType, options: _*)
-  }
 
   /**
     * Add a TEXT column type to the table.
@@ -203,9 +174,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def text(name: String, options: ColumnOption*): TableDefinition = {
+  final def text(name: String, options: ColumnOption*): TableDefinition =
     column(name, TextType, options: _*)
-  }
 
   /**
     * Add a FLOAT column type to the table.
@@ -215,9 +185,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def float(name: String, options: ColumnOption*): TableDefinition = {
+  final def float(name: String, options: ColumnOption*): TableDefinition =
     column(name, FloatType, options: _*)
-  }
 
   /**
     * Add a UUID column type to the table.
@@ -227,9 +196,8 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def uuid(name: String, options: ColumnOption*): TableDefinition = {
+  final def uuid(name: String, options: ColumnOption*): TableDefinition =
     column(name, UUIDType, options: _*)
-  }
 
   /**
     * Add a JSONB column type to the table.
@@ -239,7 +207,6 @@ class TableDefinition(adapter: DatabaseAdapter,
     *        column
     * @return the same instance
     */
-  final def jsonb(name: String, options: ColumnOption*): TableDefinition = {
+  final def jsonb(name: String, options: ColumnOption*): TableDefinition =
     column(name, JSONBType, options: _*)
-  }
 }

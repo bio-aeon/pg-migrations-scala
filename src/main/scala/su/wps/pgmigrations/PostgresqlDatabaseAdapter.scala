@@ -46,8 +46,10 @@ class PostgresqlDatabaseAdapter(override val schemaNameOpt: Option[String])
 
   override val supportsCheckConstraints = true
 
-  override def columnDefinitionFactory(columnType: SqlType,
-                                       characterSetOpt: Option[CharacterSet]): ColumnDefinition = {
+  override def columnDefinitionFactory(
+    columnType: SqlType,
+    characterSetOpt: Option[CharacterSet]
+  ): ColumnDefinition = {
     characterSetOpt match {
       case None =>
       case Some(charset @ CharacterSet(_, _)) =>
@@ -92,8 +94,10 @@ class PostgresqlDatabaseAdapter(override val schemaNameOpt: Option[String])
     }
   }
 
-  override protected def alterColumnSql(schemaNameOpt: Option[String],
-                                        columnDefinition: ColumnDefinition): String =
+  override protected def alterColumnSql(
+    schemaNameOpt: Option[String],
+    columnDefinition: ColumnDefinition
+  ): String =
     new java.lang.StringBuilder(512)
       .append("ALTER TABLE ")
       .append(quoteTableName(schemaNameOpt, columnDefinition.getTableName))

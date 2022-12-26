@@ -1,14 +1,10 @@
 package su.wps.pgmigrations
 
-import java.sql.{
-  Connection,
-  PreparedStatement
-}
+import java.sql.{Connection, PreparedStatement}
 
 object RichConnection {
-  implicit def connectionToRichConnection(c: Connection): RichConnection = {
+  implicit def connectionToRichConnection(c: Connection): RichConnection =
     new RichConnection(c)
-  }
 }
 
 /**
@@ -16,7 +12,6 @@ object RichConnection {
   * method.
   */
 class RichConnection(self: Connection) {
-  def withPreparedStatement[T](sql: String)(f: PreparedStatement => T): T = {
+  def withPreparedStatement[T](sql: String)(f: PreparedStatement => T): T =
     With.autoClosingStatement(self.prepareStatement(sql))(f)
-  }
 }

@@ -4,6 +4,7 @@ package su.wps.pgmigrations
   * Sealed trait abstracting the database to use for testing.
   */
 sealed trait TestDatabase {
+
   /**
     * Get the schema name the tests are being run in.
     */
@@ -40,8 +41,7 @@ sealed trait TestDatabase {
 /**
   * PostgreSQL test database implementation.
   */
-object PostgresqlTestDatabase
-  extends TestDatabase {
+object PostgresqlTestDatabase extends TestDatabase {
   // Username of the admin account, which will be the owner of the
   // database.
   private val adminUsername = {
@@ -57,28 +57,28 @@ object PostgresqlTestDatabase
 
   override def getUserAccountName = userUsername
 
-  override def getSchemaName: String = {
+  override def getSchemaName: String =
     System.getProperty(TestDatabase.schemaNameProperty, "public")
-  }
 
   // Load the PostgreSQL database driver.
   Class.forName("org.postgresql.Driver")
 
   override def getAdminConnectionBuilder(
-      url: String,
-      username: String,
-      password: String): ConnectionBuilder =
+    url: String,
+    username: String,
+    password: String
+  ): ConnectionBuilder =
     new ConnectionBuilder(url, username, password)
 
   override def getUserConnectionBuilder(
-      url: String,
-      username: String,
-      password: String): ConnectionBuilder =
+    url: String,
+    username: String,
+    password: String
+  ): ConnectionBuilder =
     new ConnectionBuilder(url, username, password)
 
-  override def getDatabaseAdapter: DatabaseAdapter = {
+  override def getDatabaseAdapter: DatabaseAdapter =
     new PostgresqlDatabaseAdapter(Some(getSchemaName))
-  }
 }
 
 /**
@@ -86,8 +86,7 @@ object PostgresqlTestDatabase
   * system property "scala-migrations.db.vendor", defaulting to Derby if
   * the property is not set.
   */
-object TestDatabase
-  extends TestDatabase {
+object TestDatabase extends TestDatabase {
   val adminUserNameProperty = "scala-migrations.db.admin.name"
   val adminUserPasswordProperty = "scala-migrations.db.admin.passwd"
   val databaseNameProperty = "scala-migrations.db.db"
@@ -112,12 +111,10 @@ object TestDatabase
 
   override def getDatabaseAdapter = db.getDatabaseAdapter
 
-  def execute(connectionBuilder: ConnectionBuilder,
-              sql: String): Boolean = {
+  def execute(connectionBuilder: ConnectionBuilder, sql: String): Boolean =
     connectionBuilder.withConnection(AutoCommit) { c =>
       With.autoClosingStatement(c.prepareStatement(sql)) { s =>
         s.execute()
       }
     }
-  }
 }

@@ -5,6 +5,7 @@ package su.wps.pgmigrations
   * and has a method that performs the same conversion.
   */
 sealed trait UnquotedNameConverter {
+
   /**
     * Apply the same conversion to the unquoted name that the database
     * does.
@@ -18,31 +19,25 @@ sealed trait UnquotedNameConverter {
 /**
   * The database does not modify the case of unquoted names.
   */
-case object CasePreservingUnquotedNameConverter
-  extends UnquotedNameConverter {
-  def apply(name: String): String = {
+case object CasePreservingUnquotedNameConverter extends UnquotedNameConverter {
+  def apply(name: String): String =
     name
-  }
 }
 
 /**
   * Unquoted names are implicitly converted into their lowercase
   * variant.
   */
-case object LowercaseUnquotedNameConverter
-  extends UnquotedNameConverter {
-  def apply(name: String): String = {
+case object LowercaseUnquotedNameConverter extends UnquotedNameConverter {
+  def apply(name: String): String =
     name.toLowerCase
-  }
 }
 
 /**
   * Unquoted names are implicitly converted into their uppercase
   * variant.
   */
-case object UppercaseUnquotedNameConverter
-  extends UnquotedNameConverter {
-  def apply(name: String): String = {
+case object UppercaseUnquotedNameConverter extends UnquotedNameConverter {
+  def apply(name: String): String =
     name.toUpperCase
-  }
 }

@@ -1,22 +1,10 @@
 package su.wps.pgmigrations
 
-import net.sf.log4jdbc.ConnectionSpy
+import org.slf4j.{Logger, LoggerFactory}
 
-import org.slf4j.{
-  Logger,
-  LoggerFactory
-}
+import scala.collection.{immutable, mutable}
 
-import scala.collection.{
-  immutable,
-  mutable
-}
-
-import java.net.{
-  URL,
-  URLDecoder,
-  URLClassLoader
-}
+import java.net.{URL, URLDecoder, URLClassLoader}
 import java.sql.Connection
 import java.util.jar.JarFile
 import javax.sql.DataSource
@@ -25,17 +13,18 @@ import javax.sql.DataSource
   * A migration to create the schema_migrations table that records
   * which migrations have been applied to a database.
   */
-private class CreateSchemaMigrationsTableMigration
-  extends Migration {
+private class CreateSchemaMigrationsTableMigration extends Migration {
   override def up() {
     createTable(Migrator.schemaMigrationsTableName) { t =>
       t.varchar("version", Limit(32), NotNull)
     }
 
-    addIndex(Migrator.schemaMigrationsTableName,
+    addIndex(
+      Migrator.schemaMigrationsTableName,
       Array("version"),
       Unique,
-      Name("unique_schema_migrations"))
+      Name("unique_schema_migrations")
+    )
   }
 
   override def down() {
@@ -44,6 +33,7 @@ private class CreateSchemaMigrationsTableMigration
 }
 
 object Migrator {
+
   /**
     * The name of the table that stores all the installed migration
     * version numbers.
@@ -60,9 +50,11 @@ object Migrator {
     *        should be searched
     * @return a set of the class names the JAR file contains
     */
-  private def classNamesInJar(path: String,
-                              packageName: String,
-                              searchSubPackages: Boolean): mutable.HashSet[String] = {
+  private def classNamesInJar(
+    path: String,
+    packageName: String,
+    searchSubPackages: Boolean
+  ): mutable.HashSet[String] = {
     // Search for the package in the JAR file by mapping the package
     // name to the expected name in the JAR file, then append a '/' to
     // the package name to ensure that no matches are done on
@@ -75,12 +67,12 @@ object Migrator {
       while (entries.hasMoreElements) {
         val name = entries.nextElement.getName
         if (name.startsWith(pn) && name.endsWith(".class")) {
-          val className = name.substring(0, name.length - ".class".length)
+          val className = name
+            .substring(0, name.length - ".class".length)
             .replace('/', '.')
           if (searchSubPackages) {
             classNames += className
-          }
-          else if (!className.substring(pn.length).contains('.')) {
+          } else if (!className.substring(pn.length).contains('.')) {
             classNames += className
           }
         }
@@ -101,24 +93,25 @@ object Migrator {
     *        should be searched
     * @return a set of the class names the directory contains
     */
-  private def classNamesInDir(file: java.io.File,
-                              packageName: String,
-                              searchSubPackages: Boolean): mutable.HashSet[String] = {
+  private def classNamesInDir(
+    file: java.io.File,
+    packageName: String,
+    searchSubPackages: Boolean
+  ): mutable.HashSet[String] = {
     val classNames = new mutable.HashSet[String]
 
-    def scan(f: java.io.File,
-             pn: String) {
+    def scan(f: java.io.File, pn: String) {
       val childFiles = f.listFiles
 
       for (childFile <- childFiles) {
         if (searchSubPackages && childFile.isDirectory) {
-          val childPackageName = if (pn.length > 0)
-            pn + '.' + childFile.getName
-          else
-            childFile.getName
+          val childPackageName =
+            if (pn.length > 0)
+              pn + '.' + childFile.getName
+            else
+              childFile.getName
           scan(childFile, childPackageName)
-        }
-        else if (childFile.isFile) {
+        } else if (childFile.isFile) {
           val name = childFile.getName
           if (name.endsWith(".class")) {
             val className = pn +
@@ -147,22 +140,23 @@ object Migrator {
     * @return a set of class names in the resource
     */
   private def classNamesInResource(
-                                    url: URL,
-                                    packageName: String,
-                                    searchSubPackages: Boolean): mutable.HashSet[String] = {
+    url: URL,
+    packageName: String,
+    searchSubPackages: Boolean
+  ): mutable.HashSet[String] = {
     val u = URLDecoder.decode(url.toString, "UTF-8")
 
     if (u.startsWith("jar:file:")) {
       // This URL ends with a ! character followed by the name of the
       // resource in the jar file, so just get the jar file path.
       val index = u.lastIndexOf('!')
-      val path = if (index == -1)
-        u.substring("jar:file:".length)
-      else
-        u.substring("jar:file:".length, index)
+      val path =
+        if (index == -1)
+          u.substring("jar:file:".length)
+        else
+          u.substring("jar:file:".length, index)
       classNamesInJar(path, packageName, searchSubPackages)
-    }
-    else if (u.startsWith("file:")) {
+    } else if (u.startsWith("file:")) {
       val dir = u.substring("file:".length)
       val file = new java.io.File(dir)
       if (!file.isDirectory) {
@@ -172,8 +166,7 @@ object Migrator {
         throw new RuntimeException(message)
       }
       classNamesInDir(file, packageName, searchSubPackages)
-    }
-    else {
+    } else {
       val message = "Do not know how to get a list of classes in the " +
         "resource at '" +
         u +
@@ -203,9 +196,10 @@ object Migrator {
     *         Migration subclasses as the value
     */
   private def findMigrations(
-                              packageNames: Seq[String],
-                              searchSubPackages: Boolean,
-                              logger: Logger): immutable.SortedMap[Long, Class[_ <: Migration]] = {
+    packageNames: Seq[String],
+    searchSubPackages: Boolean,
+    logger: Logger
+  ): immutable.SortedMap[Long, Class[_ <: Migration]] = {
     var currentClassLoader = this.getClass.getClassLoader
     val classNames = new mutable.HashSet[String]
     val depUrls = mutable.ArrayBuffer[URL]()
@@ -219,19 +213,21 @@ object Migrator {
 
       val urls = currentClassLoader.getResources(pn)
       if (!urls.hasMoreElements) {
-        throw new RuntimeException("Cannot find a resource for package '" +
-          packageName +
-          "'.")
+        throw new RuntimeException(
+          "Cannot find a resource for package '" +
+            packageName +
+            "'."
+        )
       }
 
       while (urls.hasMoreElements) {
         val url = urls.nextElement
-        logger.debug("For package '{}' found resource at '{}'.",
-          Array[AnyRef](packageName, url): _*)
+        logger.debug(
+          "For package '{}' found resource at '{}'.",
+          Array[AnyRef](packageName, url): _*
+        )
 
-        classNames ++= classNamesInResource(url,
-          packageName,
-          searchSubPackages)
+        classNames ++= classNamesInResource(url, packageName, searchSubPackages)
 
         val depUri = url.toURI.toString
         depUrls += new URL(depUri.substring(0, depUri.lastIndexOf(pn)))
@@ -256,24 +252,25 @@ object Migrator {
 
     for (className <- classNames) {
       val index = className.lastIndexOf('.')
-      val baseName = if (index == -1)
-        className
-      else
-        className.substring(index + 1)
+      val baseName =
+        if (index == -1)
+          className
+        else
+          className.substring(index + 1)
       val matcher = re.matcher(baseName)
       if (matcher.matches) {
         val versionStr = matcher.group(1)
         val versionOpt =
           try {
             Some(java.lang.Long.parseLong(versionStr))
-          }
-          catch {
+          } catch {
             case e: NumberFormatException => {
               skipNames += className
               logger.debug(
                 "Skipping '{}' because the version string '{}' could not " +
                   "be parsed as a long integer.",
-                Array[AnyRef](className, versionStr): _*)
+                Array[AnyRef](className, versionStr): _*
+              )
               None
             }
           }
@@ -312,11 +309,12 @@ object Migrator {
           }
           case None =>
         }
-      }
-      else {
+      } else {
         skipNames += className
-        logger.debug("Skipping '{}' because it does not match '{}'.",
-          Array[AnyRef](className, reStr): _*)
+        logger.debug(
+          "Skipping '{}' because it does not match '{}'.",
+          Array[AnyRef](className, reStr): _*
+        )
       }
     }
 
@@ -331,30 +329,32 @@ object Migrator {
         val classLoader = new URLClassLoader(depUrls.toArray, currentClassLoader)
         c = classLoader.loadClass(className)
         if (classOf[Migration].isAssignableFrom(c) &&
-          !c.isInterface &&
-          !java.lang.reflect.Modifier.isAbstract(c.getModifiers)) {
+            !c.isInterface &&
+            !java.lang.reflect.Modifier.isAbstract(c.getModifiers)) {
           try {
             // Ensure that there is a no-argument constructor.
             c.getConstructor()
             val castedClass = c.asSubclass(classOf[Migration])
             results = results.insert(version, castedClass)
-          }
-          catch {
+          } catch {
             case e: NoSuchMethodException => {
-              logger.debug("Unable to find a no-argument constructor for '" +
-                className +
-                "'",
-                e)
+              logger.debug(
+                "Unable to find a no-argument constructor for '" +
+                  className +
+                  "'",
+                e
+              )
             }
           }
         }
-      }
-      catch {
+      } catch {
         case e: Exception => {
-          logger.debug("Unable to load class '" +
-            className +
-            "'.",
-            e)
+          logger.debug(
+            "Unable to load class '" +
+              className +
+              "'.",
+            e
+          )
         }
       }
     }
@@ -363,34 +363,16 @@ object Migrator {
   }
 }
 
-private class RawAndLoggingConnections(val raw: Connection,
-                                       val logging: Connection)
+private class RawAndLoggingConnections(val raw: Connection, val logging: Connection)
 
 /**
   * This class migrates the database into the desired state.
   */
-class Migrator(connectionBuilder: ConnectionBuilder,
-               adapter: DatabaseAdapter) {
+class Migrator(connectionBuilder: ConnectionBuilder, adapter: DatabaseAdapter) {
   import Migrator._
   import RichConnection._
 
   private final val logger = LoggerFactory.getLogger(this.getClass)
-
-  // Since log4jdbc is not in any public Maven repository [1][2], to
-  // make it easier for developers that want to use Scala Migrations
-  // and are using a build tool which has automatic dependency
-  // resolution, so they do not need to manually download log4jdbc
-  // themselves, make log4jdbc optional by dynamically checking if it
-  // is available and use it if it is.
-  // [1] http://code.google.com/p/log4jdbc/wiki/FAQ
-  // [2] http://code.google.com/p/log4jdbc/issues/detail?id=19
-  private final val log4jdbcAvailable = try {
-    Class.forName("net.sf.log4jdbc.ConnectionSpy")
-    true
-  }
-  catch {
-    case _: Exception => false
-  }
 
   /**
     * Construct a migrator to a database that does not need a username
@@ -400,8 +382,7 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     * @param adapter a concrete DatabaseAdapter that the migrator uses
     *        to handle database specific features
     */
-  def this(jdbcUrl: String,
-           adapter: DatabaseAdapter) {
+  def this(jdbcUrl: String, adapter: DatabaseAdapter) {
     this(new ConnectionBuilder(jdbcUrl), adapter)
   }
 
@@ -415,10 +396,7 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     * @param adapter a concrete DatabaseAdapter that the migrator uses
     *        to handle database specific features
     */
-  def this(jdbcUrl: String,
-           jdbcUsername: String,
-           jdbcPassword: String,
-           adapter: DatabaseAdapter) {
+  def this(jdbcUrl: String, jdbcUsername: String, jdbcPassword: String, adapter: DatabaseAdapter) {
     this(new ConnectionBuilder(jdbcUrl, jdbcUsername, jdbcPassword), adapter)
   }
 
@@ -429,8 +407,7 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     * @param adapter a concrete DatabaseAdapter that the migrator uses
     *        to handle database specific features
     */
-  def this(jdbcDatasource: DataSource,
-           adapter: DatabaseAdapter) {
+  def this(jdbcDatasource: DataSource, adapter: DatabaseAdapter) {
     this(new ConnectionBuilder(jdbcDatasource), adapter)
   }
 
@@ -445,12 +422,13 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     * @param adapter a concrete DatabaseAdapter that the migrator uses
     *        to handle database specific features
     */
-  def this(jdbcDatasource: DataSource,
-           jdbcUsername: String,
-           jdbcPassword: String,
-           adapter: DatabaseAdapter) {
-    this(new ConnectionBuilder(jdbcDatasource, jdbcUsername, jdbcPassword),
-      adapter)
+  def this(
+    jdbcDatasource: DataSource,
+    jdbcUsername: String,
+    jdbcPassword: String,
+    adapter: DatabaseAdapter
+  ) {
+    this(new ConnectionBuilder(jdbcDatasource, jdbcUsername, jdbcPassword), adapter)
   }
 
   /**
@@ -466,15 +444,10 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     *        connection
     * @return what f returns
     */
-  private[pgmigrations] def withLoggingConnection[T](commitBehavior: CommitBehavior)(f: Connection => T): T = {
-    connectionBuilder.withConnection(commitBehavior) { rawConnection =>
-      val c = if (log4jdbcAvailable)
-        new ConnectionSpy(rawConnection)
-      else
-        rawConnection
-      f(c)
-    }
-  }
+  private[pgmigrations] def withLoggingConnection[T](
+    commitBehavior: CommitBehavior
+  )(f: Connection => T): T =
+    connectionBuilder.withConnection(commitBehavior)(f)
 
   /**
     * Get a tuple of database connections, a raw one and one that logs
@@ -490,15 +463,12 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     *        pair of related connections
     * @return what f returns
     */
-  private[pgmigrations] def withConnections[T](commitBehavior: CommitBehavior)(f: RawAndLoggingConnections => T): T = {
+  private[pgmigrations] def withConnections[T](
+    commitBehavior: CommitBehavior
+  )(f: RawAndLoggingConnections => T): T =
     connectionBuilder.withConnection(commitBehavior) { rawConnection =>
-      val c = if (log4jdbcAvailable)
-        new ConnectionSpy(rawConnection)
-      else
-        rawConnection
-      f(new RawAndLoggingConnections(rawConnection, c))
+      f(new RawAndLoggingConnections(rawConnection, rawConnection))
     }
-  }
 
   /**
     * Get a list of table names.  If the database adapter was given a
@@ -507,25 +477,22 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     * @return a set of table names; no modifications of the case of
     *         table names is done
     */
-  def getTableNames: mutable.Set[String] = {
+  def getTableNames: mutable.Set[String] =
     withLoggingConnection(AutoCommit) { connection =>
       val schemaPattern = adapter.schemaNameOpt match {
         case Some(n) => adapter.unquotedNameConverter(n)
         case None => null
       }
       val metadata = connection.getMetaData
-      With.autoClosingResultSet(metadata.getTables(null,
-        schemaPattern,
-        null,
-        Array("TABLE"))) { rs =>
-        val names = new mutable.HashSet[String]
-        while (rs.next()) {
-          names += rs.getString(3)
-        }
-        names
+      With.autoClosingResultSet(metadata.getTables(null, schemaPattern, null, Array("TABLE"))) {
+        rs =>
+          val names = new mutable.HashSet[String]
+          while (rs.next()) {
+            names += rs.getString(3)
+          }
+          names
       }
     }
-  }
 
   /**
     * Execute a migration in the given direction.
@@ -536,11 +503,12 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     *        is updated using the given connection and migration
     *        version number; this allows this method to
     */
-  private def runMigration(migrationClass: Class[_ <: Migration],
-                           direction: MigrationDirection,
-                           versionUpdateOpt: Option[(Connection, Long)]) {
-    logger.info("Migrating {} with '{}'.",
-      Array[AnyRef](direction.str, migrationClass.getName): _*)
+  private def runMigration(
+    migrationClass: Class[_ <: Migration],
+    direction: MigrationDirection,
+    versionUpdateOpt: Option[(Connection, Long)]
+  ) {
+    logger.info("Migrating {} with '{}'.", Array[AnyRef](direction.str, migrationClass.getName): _*)
 
     val migration = migrationClass.getConstructor().newInstance()
     withConnections(CommitUponReturnOrRollbackUponException) { connections =>
@@ -559,12 +527,14 @@ class Migrator(connectionBuilder: ConnectionBuilder,
         val tableName = adapter.quoteTableName(schemaMigrationsTableName)
         val sql =
           direction match {
-            case Up => "INSERT INTO " +
-              tableName +
-              " (version) VALUES (?)"
-            case Down => "DELETE FROM " +
-              tableName +
-              " WHERE version = ?"
+            case Up =>
+              "INSERT INTO " +
+                tableName +
+                " (version) VALUES (?)"
+            case Down =>
+              "DELETE FROM " +
+                tableName +
+                " WHERE version = ?"
           }
 
         schemaConnection.withPreparedStatement(sql) { statement =>
@@ -616,15 +586,16 @@ class Migrator(connectionBuilder: ConnectionBuilder,
           val versionStr = rs.getString(1)
           try {
             val version = java.lang.Long.parseLong(versionStr)
-            versions = versions.insert(version)
-          }
-          catch {
+            versions = versions.incl(version)
+          } catch {
             case e: NumberFormatException => {
-              logger.warn("Ignoring installed migration with unparsable " +
-                "version number '" +
-                versionStr +
-                "'.",
-                e)
+              logger.warn(
+                "Ignoring installed migration with unparsable " +
+                  "version number '" +
+                  versionStr +
+                  "'.",
+                e
+              )
             }
           }
         }
@@ -640,11 +611,10 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     * @return a sorted set of version numbers of the installed
     *         migrations
     */
-  def getInstalledVersions: scala.collection.SortedSet[Long] = {
+  def getInstalledVersions: scala.collection.SortedSet[Long] =
     withLoggingConnection(AutoCommit) { connection =>
       getInstalledVersions(connection)
     }
-  }
 
   /**
     * Migrate the database.
@@ -660,9 +630,7 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     *        should be searched
     * @param operation the migration operation that should be performed
     */
-  def migrate(operation: MigratorOperation,
-              packageNames: Seq[String],
-              searchSubPackages: Boolean) {
+  def migrate(operation: MigratorOperation, packageNames: Seq[String], searchSubPackages: Boolean) {
     initializeSchemaMigrationsTable()
 
     // Get a new connection that locks the schema_migrations table.
@@ -671,8 +639,7 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     // exception is thrown or not, this ensures that any migrations
     // that were successfully run are recorded.
     withLoggingConnection(CommitUponReturnOrException) { schemaConnection =>
-      logger.debug("Getting an exclusive lock on the '{}' table.",
-        schemaMigrationsTableName)
+      logger.debug("Getting an exclusive lock on the '{}' table.", schemaMigrationsTableName)
       val sql = adapter.lockTableSql(schemaMigrationsTableName)
       schemaConnection.withPreparedStatement(sql) { statement =>
         statement.execute()
@@ -687,17 +654,17 @@ class Migrator(connectionBuilder: ConnectionBuilder,
       // missing migration for an installed migration is not fatal
       // unless the migration needs to be rolled back.
       val installedVersions = getInstalledVersions(schemaConnection).toArray
-      val availableMigrations = findMigrations(packageNames,
-        searchSubPackages,
-        logger)
+      val availableMigrations = findMigrations(packageNames, searchSubPackages, logger)
       val availableVersions = availableMigrations.keySet.toArray
 
       for (installedVersion <- installedVersions) {
         if (!availableVersions.contains(installedVersion)) {
-          logger.warn("The migration version '{}' is installed but " +
-            "there is no migration class available to back " +
-            "it out.",
-            installedVersion)
+          logger.warn(
+            "The migration version '{}' is installed but " +
+              "there is no migration class available to back " +
+              "it out.",
+            installedVersion
+          )
         }
       }
 
@@ -705,43 +672,43 @@ class Migrator(connectionBuilder: ConnectionBuilder,
         logger.info("No migrations found, nothing to do.")
       }
 
-      case class InstallAndRemove(installVersions: Array[Long],
-                                  removeVersions: Array[Long])
+      case class InstallAndRemove(installVersions: Array[Long], removeVersions: Array[Long])
 
       // From the operation, determine the migrations to install and
       // the ones to uninstall.
       val installRemove =
-      operation match {
-        case InstallAllMigrations => {
-          new InstallAndRemove(availableVersions, new Array[Long](0))
-        }
-        case RemoveAllMigrations => {
-          new InstallAndRemove(new Array[Long](0), installedVersions.reverse)
-        }
-        case MigrateToVersion(version) => {
-          val index = availableVersions.indexWhere(_ == version)
-          if (index == -1) {
-            val message = "The target version " +
-              version +
-              " does not exist as a migration."
-            throw new RuntimeException(message)
+        operation match {
+          case InstallAllMigrations => {
+            new InstallAndRemove(availableVersions, new Array[Long](0))
           }
-          new InstallAndRemove(availableVersions.take(index + 1).toArray,
-            installedVersions.filter(_ > version).reverse)
-        }
-        case RollbackMigration(count) => {
-          if (count > installedVersions.length) {
-            val message = "Attempting to rollback " +
-              count +
-              " migrations but the database only has " +
-              installedVersions.length +
-              " installed in it."
-            throw new RuntimeException(message)
+          case RemoveAllMigrations => {
+            new InstallAndRemove(new Array[Long](0), installedVersions.reverse)
           }
-          new InstallAndRemove(new Array[Long](0),
-            installedVersions.reverse.take(count))
+          case MigrateToVersion(version) => {
+            val index = availableVersions.indexWhere(_ == version)
+            if (index == -1) {
+              val message = "The target version " +
+                version +
+                " does not exist as a migration."
+              throw new RuntimeException(message)
+            }
+            new InstallAndRemove(
+              availableVersions.take(index + 1).toArray,
+              installedVersions.filter(_ > version).reverse
+            )
+          }
+          case RollbackMigration(count) => {
+            if (count > installedVersions.length) {
+              val message = "Attempting to rollback " +
+                count +
+                " migrations but the database only has " +
+                installedVersions.length +
+                " installed in it."
+              throw new RuntimeException(message)
+            }
+            new InstallAndRemove(new Array[Long](0), installedVersions.reverse.take(count))
+          }
         }
-      }
 
       // Always remove migrations before installing new ones.
       for (removeVersion <- installRemove.removeVersions) {
@@ -750,9 +717,7 @@ class Migrator(connectionBuilder: ConnectionBuilder,
         // but when it cannot be removed, it is.
         availableMigrations.get(removeVersion) match {
           case Some(clazz) => {
-            runMigration(clazz,
-              Down,
-              Some((schemaConnection, removeVersion)))
+            runMigration(clazz, Down, Some((schemaConnection, removeVersion)))
           }
           case None => {
             val message = "The database has migration version '" +
@@ -769,9 +734,7 @@ class Migrator(connectionBuilder: ConnectionBuilder,
         if (!installedVersions.contains(installVersion)) {
           availableMigrations.get(installVersion) match {
             case Some(clazz) => {
-              runMigration(clazz,
-                Up,
-                Some((schemaConnection, installVersion)))
+              runMigration(clazz, Up, Some((schemaConnection, installVersion)))
             }
             case None => {
               val message = "Illegal state: trying to install a migration " +
@@ -798,15 +761,16 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     * @param searchSubPackages true if sub-packages of packageName
     *        should be searched
     */
-  def getMigrationStatuses(packageNames: Seq[String],
-                           searchSubPackages: Boolean): MigrationStatuses = {
-    val availableMigrations = findMigrations(packageNames,
-      searchSubPackages,
-      logger)
-    val installedVersions = if (doesSchemaMigrationsTableExist)
-      getInstalledVersions
-    else
-      new immutable.TreeSet[Long]
+  def getMigrationStatuses(
+    packageNames: Seq[String],
+    searchSubPackages: Boolean
+  ): MigrationStatuses = {
+    val availableMigrations = findMigrations(packageNames, searchSubPackages, logger)
+    val installedVersions =
+      if (doesSchemaMigrationsTableExist)
+        getInstalledVersions
+      else
+        new immutable.TreeSet[Long]
 
     var notInstalled = availableMigrations
     var installedWithAvailableImplementation =
@@ -819,8 +783,7 @@ class Migrator(connectionBuilder: ConnectionBuilder,
       availableMigrations.get(installedVersion) match {
         case Some(clazz) => {
           installedWithAvailableImplementation =
-            installedWithAvailableImplementation.insert(installedVersion,
-              clazz)
+            installedWithAvailableImplementation.insert(installedVersion, clazz)
         }
         case None => {
           installedWithoutAvailableImplementation += installedVersion
@@ -828,9 +791,11 @@ class Migrator(connectionBuilder: ConnectionBuilder,
       }
     }
 
-    new MigrationStatuses(notInstalled,
+    new MigrationStatuses(
+      notInstalled,
       installedWithAvailableImplementation,
-      installedWithoutAvailableImplementation)
+      installedWithoutAvailableImplementation
+    )
   }
 
   /**
@@ -854,20 +819,17 @@ class Migrator(connectionBuilder: ConnectionBuilder,
     *         installed migrations that do not have a matching
     *         Migration subclass
     */
-  def whyNotMigrated(packageNames: Seq[String],
-                     searchSubPackages: Boolean): Option[String] = {
-    val migrationStatuses = getMigrationStatuses(packageNames,
-      searchSubPackages)
+  def whyNotMigrated(packageNames: Seq[String], searchSubPackages: Boolean): Option[String] = {
+    val migrationStatuses = getMigrationStatuses(packageNames, searchSubPackages)
 
     val notInstalled = migrationStatuses.notInstalled
     val installedWithoutAvailableImplementation =
       migrationStatuses.installedWithoutAvailableImplementation
 
     if (notInstalled.isEmpty &&
-      installedWithoutAvailableImplementation.isEmpty) {
+        installedWithoutAvailableImplementation.isEmpty) {
       None
-    }
-    else {
+    } else {
       val sb = new java.lang.StringBuilder(256)
       sb.append("The database is not fully migrated because ")
 
@@ -880,8 +842,10 @@ class Migrator(connectionBuilder: ConnectionBuilder,
       }
 
       if (!installedWithoutAvailableImplementation.isEmpty) {
-        sb.append("the following migrations are installed without a " +
-          "matching Migration subclass: ")
+        sb.append(
+          "the following migrations are installed without a " +
+            "matching Migration subclass: "
+        )
         sb.append(installedWithoutAvailableImplementation.mkString(", "))
       }
 

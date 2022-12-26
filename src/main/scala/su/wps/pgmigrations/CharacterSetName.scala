@@ -24,5 +24,4 @@ sealed trait CharacterSetName
   * encoding can only be specified when the database is created; using
   * it generates a runtime warning.
   */
-case object Unicode
-  extends CharacterSetName
+case object Unicode extends CharacterSetName

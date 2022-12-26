@@ -18,16 +18,14 @@ private sealed trait CommitBehavior
   * transaction any before returning the result of the
   * Migrator#with*Connection()'s closure or rethrowing its exception.
   */
-private case object AutoCommit
-  extends CommitBehavior
+private case object AutoCommit extends CommitBehavior
 
 /**
   * The new database connection's auto-commit mode is turned off.
   * Regardless if the closure passed to Migrator#with*Connection()
   * returns or throws an exception the transaction is committed.
   */
-private case object CommitUponReturnOrException
-  extends CommitBehavior
+private case object CommitUponReturnOrException extends CommitBehavior
 
 /**
   * The new database connection's auto-commit mode is turned off.  If
@@ -35,5 +33,4 @@ private case object CommitUponReturnOrException
   * normally then transaction is committed; if it throws an exception
   * then the transaction is rolled back.
   */
-private case object CommitUponReturnOrRollbackUponException
-  extends CommitBehavior
+private case object CommitUponReturnOrRollbackUponException extends CommitBehavior

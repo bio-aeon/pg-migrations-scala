@@ -12,8 +12,7 @@ sealed trait ForeignKeyConstraintAction {
   * in the referenced table, or update the row's value to the new value
   * in the referenced row if it was updated.
   */
-case object Cascade
-  extends ForeignKeyConstraintAction {
+case object Cascade extends ForeignKeyConstraintAction {
   override val sql = "CASCADE"
 }
 
@@ -22,8 +21,7 @@ case object Cascade
   * foreign key constraint violation.  In some databases, NO ACTION
   * implies a deferred check, after all deletes have been performed.
   */
-case object NoAction
-  extends ForeignKeyConstraintAction {
+case object NoAction extends ForeignKeyConstraintAction {
   override val sql = "NO ACTION"
 }
 
@@ -32,8 +30,7 @@ case object NoAction
   * foreign key constraint violation.  This is the same as NoAction,
   * except that any checks are not deferred.
   */
-case object Restrict
-  extends ForeignKeyConstraintAction {
+case object Restrict extends ForeignKeyConstraintAction {
   override val sql = "RESTRICT"
 }
 
@@ -42,8 +39,7 @@ case object Restrict
   * the referenced rows are deleted or updated.  Not all databases
   * support SET DEFAULT for ON UPDATE.
   */
-case object SetDefault
-  extends ForeignKeyConstraintAction {
+case object SetDefault extends ForeignKeyConstraintAction {
   override val sql = "SET DEFAULT"
 }
 
@@ -52,7 +48,6 @@ case object SetDefault
   * rows are deleted or updated.  Not all databases support SET DEFAULT
   * for ON UPDATE.
   */
-case object SetNull
-  extends ForeignKeyConstraintAction {
+case object SetNull extends ForeignKeyConstraintAction {
   override val sql = "SET NULL"
 }

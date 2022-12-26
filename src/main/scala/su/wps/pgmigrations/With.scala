@@ -2,11 +2,7 @@ package su.wps.pgmigrations
 
 import org.slf4j.LoggerFactory
 
-import java.sql.{
-  Connection,
-  ResultSet,
-  Statement
-}
+import java.sql.{Connection, ResultSet, Statement}
 import java.util.jar.JarFile
 
 /**
@@ -43,27 +39,25 @@ object With {
     var primaryException: Throwable = null
     try {
       body(resource)
-    }
-    catch {
+    } catch {
       case e: Throwable => {
         primaryException = e
         throw e
       }
-    }
-    finally {
+    } finally {
       if (primaryException eq null) {
         closer(resource)
-      }
-      else {
+      } else {
         try {
           closer(resource)
-        }
-        catch {
+        } catch {
           case e: Throwable =>
-            logger.warn("Suppressing exception when " +
-              closerDescription +
-              ':',
-              e)
+            logger.warn(
+              "Suppressing exception when " +
+                closerDescription +
+                ':',
+              e
+            )
         }
       }
     }
@@ -80,9 +74,8 @@ object With {
     *        connection
     * @return the result of f
     */
-  def autoClosingConnection[C <: Connection, R](connection: C)(f: C => R): R = {
+  def autoClosingConnection[C <: Connection, R](connection: C)(f: C => R): R =
     resource(connection, "closing connection")(_.close())(f)
-  }
 
   /**
     * Take a SQL connection, save its current auto-commit mode, put the
@@ -104,12 +97,12 @@ object With {
     *        connection
     * @return the result of f
     */
-  def autoRestoringConnection[C <: Connection, R](connection: C,
-                                                  mode: Boolean)(f: C => R): R = {
+  def autoRestoringConnection[C <: Connection, R](connection: C, mode: Boolean)(f: C => R): R = {
     val currentMode = connection.getAutoCommit
-    With.resource(connection, "restoring connection auto-commit")(_.setAutoCommit(currentMode)) { c =>
-      c.setAutoCommit(mode)
-      f(c)
+    With.resource(connection, "restoring connection auto-commit")(_.setAutoCommit(currentMode)) {
+      c =>
+        c.setAutoCommit(mode)
+        f(c)
     }
   }
 
@@ -128,8 +121,9 @@ object With {
     *        connection
     * @return the result of f
     */
-  def autoCommittingConnection[C <: Connection, R](connection: C,
-                                                   commitBehavior: CommitBehavior)(f: C => R): R = {
+  def autoCommittingConnection[C <: Connection, R](connection: C, commitBehavior: CommitBehavior)(
+    f: C => R
+  ): R = {
     val newCommitBehavior =
       commitBehavior match {
         case AutoCommit => true
@@ -151,16 +145,17 @@ object With {
           val result =
             try {
               f(connection)
-            }
-            catch {
+            } catch {
               case e1: Throwable => {
                 try {
                   connection.rollback()
-                }
-                catch {
+                } catch {
                   case e2: Throwable =>
-                    logger.warn("Suppressing exception when rolling back" +
-                      "transaction:", e2)
+                    logger.warn(
+                      "Suppressing exception when rolling back" +
+                        "transaction:",
+                      e2
+                    )
                 }
                 throw e1
               }
@@ -185,9 +180,8 @@ object With {
     *        statement
     * @return the result of f
     */
-  def autoClosingStatement[S <: Statement, R](statement: S)(f: S => R): R = {
+  def autoClosingStatement[S <: Statement, R](statement: S)(f: S => R): R =
     resource(statement, "closing statement")(_.close())(f)
-  }
 
   /**
     * Take a SQL result set, pass it to a closure and ensure that the
@@ -200,9 +194,8 @@ object With {
     *        result set
     * @return the result of f
     */
-  def autoClosingResultSet[RS <: ResultSet, R](resultSet: RS)(f: RS => R): R = {
+  def autoClosingResultSet[RS <: ResultSet, R](resultSet: RS)(f: RS => R): R =
     resource(resultSet, "closing result set")(_.close())(f)
-  }
 
   /**
     * Take a jar file, pass it to a closure and ensure that the jar
@@ -215,7 +208,6 @@ object With {
     *        file
     * @return the result of f
     */
-  def jarFile[J <: JarFile, R](jarFile: J)(f: J => R): R = {
+  def jarFile[J <: JarFile, R](jarFile: J)(f: J => R): R =
     resource(jarFile, "closing jar file")(_.close())(f)
-  }
 }

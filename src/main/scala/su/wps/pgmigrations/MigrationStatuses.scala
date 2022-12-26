@@ -14,6 +14,8 @@ package su.wps.pgmigrations
   *        migration version numbers that are currently installed in
   *        the database but do not have a matching a Migration subclass
   */
-case class MigrationStatuses(notInstalled: scala.collection.SortedMap[Long, Class[_ <: Migration]],
-                             installedWithAvailableImplementation: scala.collection.SortedMap[Long, Class[_ <: Migration]],
-                             installedWithoutAvailableImplementation: scala.collection.SortedSet[Long])
+case class MigrationStatuses(
+  notInstalled: scala.collection.SortedMap[Long, Class[_ <: Migration]],
+  installedWithAvailableImplementation: scala.collection.SortedMap[Long, Class[_ <: Migration]],
+  installedWithoutAvailableImplementation: scala.collection.SortedSet[Long]
+)

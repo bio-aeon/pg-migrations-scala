@@ -6,6 +6,7 @@ package su.wps.pgmigrations
   * statement.
   */
 sealed abstract class User {
+
   /**
     * The user quoted for a SQL statement.
     *
@@ -22,11 +23,9 @@ sealed abstract class User {
   *
   * @param userName the user name
   */
-class PlainUser(userName: String)
-  extends User {
-  override def quoted(unquotedNameConverter: UnquotedNameConverter): String = {
+class PlainUser(userName: String) extends User {
+  override def quoted(unquotedNameConverter: UnquotedNameConverter): String =
     '"' + unquotedNameConverter(userName) + '"'
-  }
 }
 
 /**
@@ -34,6 +33,7 @@ class PlainUser(userName: String)
   * syntax, e.g. User('foobar').
   */
 object User {
+
   /**
     * Given a user name, return a PlainUser instance.
     *
@@ -47,6 +47,7 @@ object User {
   * A factory for User instances that are built from a user name.
   */
 abstract class UserFactory[T <: User] {
+
   /**
     * Given a user name, return a User instance.
     *
@@ -59,7 +60,6 @@ abstract class UserFactory[T <: User] {
 /**
   * Singleton UserFactory that creates PlainUser instances.
   */
-object PlainUserFactory
-  extends UserFactory[PlainUser] {
+object PlainUserFactory extends UserFactory[PlainUser] {
   override def nameToUser(userName: String) = User(userName)
 }

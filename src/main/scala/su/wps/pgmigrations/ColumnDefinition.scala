@@ -465,8 +465,10 @@ abstract class ColumnDefinition {
     * @return the column type name with the limit syntax if a limit was
     *         given
     */
-  protected def optionallyAddLimitToDataType(columnTypeName: String,
-                                             limitOpt: Option[String]): String =
+  protected def optionallyAddLimitToDataType(
+    columnTypeName: String,
+    limitOpt: Option[String]
+  ): String =
     limitOpt match {
       case Some(l) => columnTypeName + "(" + l + ")"
       case None => columnTypeName
@@ -556,7 +558,7 @@ class DefaultTimestampColumnDefinition
 }
 
 class DefaultTimestampzColumnDefinition
-  extends ColumnDefinition
+    extends ColumnDefinition
     with ColumnSupportsLimit
     with ColumnSupportsDefault {
   override protected def sql = optionallyAddLimitToDataType("TIMESTAMPTZ")

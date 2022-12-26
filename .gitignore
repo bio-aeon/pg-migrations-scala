@@ -1,6 +1,7 @@
 target
 ideatarget
 .target
+.bsp
 bin
 .cache
 .cache-main
@@ -14,4 +15,3 @@ logs
 *.class
 *.sc
 .idea
-
