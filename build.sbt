@@ -5,7 +5,7 @@ lazy val root = (project in file(".")).
     inThisBuild(List(
       organization := "su.wps",
       scalaVersion := "2.12.8",
-      version      := "0.1.0-SNAPSHOT"
+      version      := "0.1.0"
     )),
     name := "pg-migrations-scala",
     libraryDependencies ++= Seq(
